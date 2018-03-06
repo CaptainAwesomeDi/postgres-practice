@@ -9,15 +9,18 @@ const client = new pg.Client({
   port: settings.port,
   ssl: settings.ssl
 });
-client.connect()
+client.connect();
 
 const userInput = process.argv[2];
 
-const findLastName = (lastName) => {
-  client.query('SELECT * FROM famous_people WHERE last_name = $1', [lastName], (err, res) => {
-    console.log(err ? err.stack : res.rows[0]);
-    client.end();
+const findName = (name) => {
+  client.query('SELECT * FROM famous_people WHERE first_name = $1 OR last_name = $1', [name], (err, results) => {
+    console.log('Searching...');
+    console.log(`Found ${results.rows.length} Person(s) by the name ${name}`);
+    results.rows.forEach((result) => {
+      console.log("index:", result.id, "First Name:", result.first_name, "Last Name: ", result.last_name, "D.O.B.", result.birthdate.toDateString());
+    });
   });
 }
 
-findLastName(userInput);
+findName(userInput);
